@@ -15,32 +15,32 @@
  */
 package org.trustedanalytics.servicebroker.zk.plans;
 
-import com.google.common.collect.ImmutableMap;
-import org.cloudfoundry.community.servicebroker.model.ServiceInstance;
-import org.junit.Test;
-import org.trustedanalytics.servicebroker.framework.Credentials;
-import org.trustedanalytics.servicebroker.zk.plans.binding.ZookeeperBindingClientFactory;
+import static org.hamcrest.Matchers.hasEntry;
+import static org.junit.Assert.assertThat;
+import static org.trustedanalytics.servicebroker.test.cloudfoundry.CfModelsFactory.getServiceInstance;
 
 import java.util.Map;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertThat;
-import static org.trustedanalytics.servicebroker.test.cloudfoundry.CfModelsFactory.getServiceInstance;
+import org.cloudfoundry.community.servicebroker.model.ServiceInstance;
+import org.junit.Test;
+import org.trustedanalytics.servicebroker.zk.config.ExternalConfiguration;
+import org.trustedanalytics.servicebroker.zk.plans.binding.ZookeeperBindingClientFactory;
 
 public class ZookeeperPlanSharedTest {
   @Test
   public void bind_addInstanceIdToZnodePath_returnCredentialsMap() throws Exception {
     //arrange
+    ExternalConfiguration configuration = new ExternalConfiguration();
+    configuration.setBrokerRootNode("/userspace");
+
     ZookeeperPlanShared plan =
-        new ZookeeperPlanShared(ZookeeperBindingClientFactory.create(
-            new Credentials(ImmutableMap.of("zk.cluster", "test")), "/userspace"));
+        new ZookeeperPlanShared(ZookeeperBindingClientFactory.create(configuration));
 
     //act
     ServiceInstance serviceInstance = getServiceInstance();
     Map<String, Object> actualOutputCredentials = plan.bind(serviceInstance);
 
     //assert
-    assertThat(actualOutputCredentials, hasEntry("zk.cluster", "test"));
     assertThat(actualOutputCredentials,
         hasEntry("zk.node", "/userspace/" + serviceInstance.getServiceInstanceId()));
   }

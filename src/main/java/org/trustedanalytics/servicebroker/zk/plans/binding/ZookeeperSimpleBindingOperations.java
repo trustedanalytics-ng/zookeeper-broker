@@ -20,5 +20,4 @@ import java.util.UUID;
 
 public interface ZookeeperSimpleBindingOperations {
   Map<String, Object> createCredentialsMap(UUID instanceId);
-  Map<String, Object> getBareCredentialsMap();
 }

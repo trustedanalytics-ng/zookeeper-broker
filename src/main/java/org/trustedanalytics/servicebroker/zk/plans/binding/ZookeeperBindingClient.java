@@ -21,31 +21,25 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.trustedanalytics.servicebroker.framework.Credentials;
+import org.trustedanalytics.servicebroker.zk.config.ExternalConfiguration;
 
 @Component
 class ZookeeperBindingClient implements ZookeeperSimpleBindingOperations {
 
   private static final String ZNODE_KEY = "zk.node";
 
-  private final Credentials credentials;
   private final String userspacePathTemplate;
 
   @Autowired
-  public ZookeeperBindingClient(Credentials credentials, String userspacePathTemplate) {
-    this.credentials = credentials;
-    this.userspacePathTemplate = userspacePathTemplate;
+  public ZookeeperBindingClient(ExternalConfiguration configuration) {
+    this.userspacePathTemplate = configuration.getBrokerRootNode();
   }
 
   @Override
   public Map<String, Object> createCredentialsMap(UUID instanceId) {
-    Map<String, Object> credentialsCopy = new HashMap<>(credentials.getCredentialsMap());
+    Map<String, Object> credentialsCopy = new HashMap<>();
     credentialsCopy.put(ZNODE_KEY, String.format("%s/%s", userspacePathTemplate, instanceId));
     return credentialsCopy;
   }
 
-  @Override
-  public Map<String, Object> getBareCredentialsMap() {
-    return credentials.getCredentialsMap();
-  }
 }

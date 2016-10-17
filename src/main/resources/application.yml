@@ -10,6 +10,7 @@ store:
   cluster: ${zk.cluster.url}
   user: ${system.user}
   password: ${system.user.password}
+  keytabPath: ${system.user.keytab.path}
 cf:
   catalog:
     serviceName: ${cf.catalog.servicename:zookeeper}
@@ -17,10 +18,6 @@ cf:
     serviceDescription: ZOOKEEPER service for creating znodes on hadoop distributed coordination service
     baseId: ${BASE_GUID:}
     plans:
-      - id: bare-plan
-        name: bare
-        description: bare
-        free: true
       - id: shared-plan
         name: shared
         description: shared

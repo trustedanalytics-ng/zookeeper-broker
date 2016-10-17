@@ -15,11 +15,10 @@
  */
 package org.trustedanalytics.servicebroker.zk.plans.binding;
 
-import org.trustedanalytics.servicebroker.framework.Credentials;
+import org.trustedanalytics.servicebroker.zk.config.ExternalConfiguration;
 
 public final class ZookeeperBindingClientFactory {
-  public static ZookeeperSimpleBindingOperations create(Credentials credentials,
-      String userspacePathTemplate) {
-    return new ZookeeperBindingClient(credentials, userspacePathTemplate);
+  public static ZookeeperSimpleBindingOperations create(ExternalConfiguration configuration) {
+    return new ZookeeperBindingClient(configuration);
   }
 }

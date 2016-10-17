@@ -16,9 +16,16 @@
 package org.trustedanalytics.servicebroker.zk.config;
 
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.security.auth.login.LoginException;
 
+import org.apache.zookeeper.ZooDefs;
+import org.apache.zookeeper.data.ACL;
+import org.apache.zookeeper.data.Id;
+import org.apache.zookeeper.server.auth.DigestAuthenticationProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +39,7 @@ import org.trustedanalytics.hadoop.kerberos.KrbLoginManager;
 import org.trustedanalytics.hadoop.kerberos.KrbLoginManagerFactory;
 import org.trustedanalytics.servicebroker.framework.Profiles;
 import org.trustedanalytics.servicebroker.framework.kerberos.KerberosProperties;
+import sun.security.krb5.KrbException;
 
 @Configuration
 public class ZookeeperConfiguration {
@@ -45,20 +53,37 @@ public class ZookeeperConfiguration {
   private KerberosProperties kerberosProperties;
 
   @Bean(initMethod = "init", destroyMethod = "destroy")
-  @Profile(Profiles.CLOUD)
+  @Profile(Profiles.KERBEROS)
   @Qualifier(Qualifiers.BROKER_INSTANCE)
-  public ZookeeperClient getZKClient() throws IOException, LoginException {
-    if (kerberosProperties.isKerberosEnabled()) {
-      LOGGER.info("Found kerberos configuration - trying to authenticate");
-      KrbLoginManager loginManager =
-          KrbLoginManagerFactory.getInstance().getKrbLoginManagerInstance(
-              kerberosProperties.getKdc(), kerberosProperties.getRealm());
-      loginManager.loginWithCredentials(config.getUser(), config.getPassword().toCharArray());
-    } else {
-      LOGGER.warn("kerberos configuration empty or invalid - will not try to authenticate.");
-    }
+  public ZookeeperClient getSecureZKClient() throws IOException, LoginException, KrbException {
+    LOGGER.info("Found kerberos profile configuration - trying to authenticate.");
+    String user = config.getUser();
+
+    KrbLoginManager loginManager =
+        KrbLoginManagerFactory.getInstance().getKrbLoginManagerInstance(
+            kerberosProperties.getKdc(), kerberosProperties.getRealm());
+    loginManager.loginWithKeyTab(user, config.getKeytabPath());
+
+    List<ACL> acl = Arrays.asList(new ACL(ZooDefs.Perms.ALL, new Id("sasl", user)));
 
     return new ZookeeperClientBuilder(config.getZkClusterHosts(), config.getUser(),
-        config.getBrokerRootNode(), config.getBrokerRootNode()).build();
+        config.getBrokerRootNode(), config.getBrokerRootNode()).withRootCreation(acl).build();
   }
+
+  @Bean(initMethod = "init", destroyMethod = "destroy")
+  @Profile(Profiles.SIMPLE)
+  @Qualifier(Qualifiers.BROKER_INSTANCE)
+  public ZookeeperClient getInsecureZKClient() throws IOException, NoSuchAlgorithmException {
+    LOGGER.info("Found non-kerberos profile configuration.");
+    String user = config.getUser();
+    String password = config.getPassword();
+
+    String digest = DigestAuthenticationProvider.generateDigest(
+        String.format("%s:%s", user, password));
+    List<ACL> acl = Arrays.asList(new ACL(ZooDefs.Perms.ALL, new Id("digest", digest)));
+
+    return new ZookeeperClientBuilder(config.getZkClusterHosts(), config.getUser(),
+        config.getPassword(), config.getBrokerRootNode()).withRootCreation(acl).build();
+  }
+
 }

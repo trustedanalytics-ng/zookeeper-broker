@@ -17,9 +17,9 @@ package org.trustedanalytics.servicebroker.zk.integration;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
-import static org.trustedanalytics.servicebroker.test.cloudfoundry.CfModelsFactory.getCreateBindingRequest;
-import static org.trustedanalytics.servicebroker.test.cloudfoundry.CfModelsFactory.getCreateInstanceRequest;
-import static org.trustedanalytics.servicebroker.test.cloudfoundry.CfModelsFactory.getServiceInstance;
+import static org.trustedanalytics.servicebroker.test.cloudfoundry.CfModelsFactory.*;
+
+import java.util.UUID;
 
 import org.apache.curator.test.TestingServer;
 import org.cloudfoundry.community.servicebroker.model.CreateServiceInstanceBindingRequest;
@@ -40,8 +40,6 @@ import org.trustedanalytics.servicebroker.zk.Application;
 import org.trustedanalytics.servicebroker.zk.config.ExternalConfiguration;
 import org.trustedanalytics.servicebroker.zk.integration.config.KerberosLocalConfiguration;
 import org.trustedanalytics.servicebroker.zk.integration.config.ZkLocalConfiguration;
-
-import java.util.UUID;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = {Application.class, ZkLocalConfiguration.class,

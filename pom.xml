@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>zookeeper-broker</artifactId>
 
-    <version>0.8.0</version>
+    <version>0.9.0</version>
 
     <parent>
         <groupId>org.trustedanalytics</groupId>
@@ -16,9 +16,11 @@
         <brokerVersion>2.6.0</brokerVersion>
         <brokerTestVersion>2.6.0</brokerTestVersion>
         <start-class>org.trustedanalytics.servicebroker.zk.Application</start-class>
-        <jacoco-measurement-instructions>0.5600</jacoco-measurement-instructions>
-        <jacoco-measurement-lines>0.5600</jacoco-measurement-lines>
+        <jacoco-measurement-instructions>0.3100</jacoco-measurement-instructions>
+        <jacoco-measurement-lines>0.4300</jacoco-measurement-lines>
         <jacoco-measurement-classes>0.8333</jacoco-measurement-classes>
+        <docker.imageName>${project.artifactId}</docker.imageName>
+        <docker.registry>tapimages.us.enableiot.com:8080</docker.registry>
     </properties>
 
     <build>
@@ -34,6 +36,24 @@
         </resources>
         <plugins>
             <plugin>
+                <groupId>com.spotify</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>0.4.12</version>
+                <configuration>
+                    <imageName>${docker.imageName}</imageName>
+                    <baseImage>${docker.registry}/tap-base-java:java8-jessie</baseImage>
+                    <cmd>java $JAVA_OPTS -jar /${project.build.finalName}.jar</cmd>
+                    <useConfigFile>true</useConfigFile>
+                    <resources>
+                        <resource>
+                            <targetPath>/</targetPath>
+                            <directory>${project.build.directory}</directory>
+                            <include>${project.build.finalName}.jar</include>
+                        </resource>
+                    </resources>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
@@ -47,32 +67,13 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <phase>package</phase>
-                    </execution>
-                </executions>
-                <configuration>
-                    <executable>cp</executable>
-                    <arguments>
-                        <argument>target/classes/manifest.yml</argument>
-                        <argument>manifest.yml</argument>
-                    </arguments>
-                </configuration>
-            </plugin>
-            <plugin>
                 <groupId>com.mycila</groupId>
                 <artifactId>license-maven-plugin</artifactId>
                 <version>2.6</version>
                 <configuration>
                     <includes>
                         <include>src/**/*.java</include>
-			 <include>pack.sh</include>
+                        <include>pack.sh</include>
                     </includes>
                     <excludes>
                         <exclude>src/main/java/org/trustedanalytics/servicebroker/zk/config/BrokerConfig.java</exclude>
@@ -96,7 +97,7 @@
     </build>
 
     <dependencies>
-        <!-- tag::jetty[] -->
+        <!-- Spring dependencies -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -115,29 +116,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-jetty</artifactId>
         </dependency>
-        <!-- end::jetty[] -->
-        <dependency>
-            <groupId>org.trustedanalytics.servicebroker.repository</groupId>
-            <artifactId>broker-store-commons</artifactId>
-            <version>0.5.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.cloudfoundry</groupId>
-            <artifactId>spring-boot-cf-service-broker</artifactId>
-            <version>${brokerVersion}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.cloudfoundry</groupId>
-            <artifactId>spring-boot-cf-service-broker-tests</artifactId>
-            <version>${brokerTestVersion}</version>
-            <scope>test</scope>
-        </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
@@ -146,6 +124,18 @@
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-commons</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- Broker-Store dependencies for instance and binding serialization -->
+        <dependency>
+            <groupId>org.trustedanalytics.servicebroker.repository</groupId>
+            <artifactId>broker-store-commons</artifactId>
+            <version>0.5.1</version>
+        </dependency>
+        <!-- Zookeeper dependencies -->
         <dependency>
             <groupId>org.apache.curator</groupId>
             <artifactId>curator-test</artifactId>
@@ -156,10 +146,18 @@
             <artifactId>curator-recipes</artifactId>
             <version>2.8.0</version>
         </dependency>
+        <!-- Dependency for LOMBOK project -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.16.8</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- Broker library dependencies -->
         <dependency>
             <groupId>org.trustedanalytics</groupId>
             <artifactId>broker-lib</artifactId>
-            <version>0.5.1</version>
+            <version>0.7.1</version>
         </dependency>
         <dependency>
             <groupId>org.trustedanalytics</groupId>

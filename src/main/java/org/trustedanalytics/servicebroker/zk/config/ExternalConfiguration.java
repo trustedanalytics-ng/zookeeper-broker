@@ -20,54 +20,35 @@ import javax.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @Configuration
 public class ExternalConfiguration {
 
   @Value("${store.cluster}")
   @NotNull
+  @Getter @Setter
   private String zkClusterHosts;
 
   @Value("${zk.broker.root}")
   @NotNull
+  @Getter @Setter
   private String brokerRootNode;
 
   @Value("${store.user}")
   @NotNull
+  @Getter @Setter
   private String user;
 
   @Value("${store.password}")
   @NotNull
+  @Getter @Setter
   private String password;
 
-  public String getZkClusterHosts() {
-    return zkClusterHosts;
-  }
+  @Value("${store.keytabPath}")
+  @NotNull
+  @Getter @Setter
+  private String keytabPath;
 
-  public void setZkClusterHosts(String zkClusterHosts) {
-    this.zkClusterHosts = zkClusterHosts;
-  }
-
-  public String getBrokerRootNode() {
-    return brokerRootNode;
-  }
-
-  public void setBrokerRootNode(String brokerRootNode) {
-    this.brokerRootNode = brokerRootNode;
-  }
-
-  public String getUser() {
-    return user;
-  }
-
-  public void setUser(String user) {
-    this.user = user;
-  }
-
-  public String getPassword() {
-    return password;
-  }
-
-  public void setPassword(String password) {
-    this.password = password;
-  }
 }

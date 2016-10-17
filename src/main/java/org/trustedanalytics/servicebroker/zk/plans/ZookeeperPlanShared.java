@@ -17,6 +17,7 @@ package org.trustedanalytics.servicebroker.zk.plans;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.cloudfoundry.community.servicebroker.exception.ServiceBrokerException;
@@ -40,13 +41,13 @@ class ZookeeperPlanShared implements ServicePlanDefinition {
   private ZookeeperSimpleBindingOperations zookeeperSimpleBindingOperations;
 
   @Autowired
-  public ZookeeperPlanShared(ZookeeperSimpleBindingOperations zookeeperSimpleBindingOperations){
+  public ZookeeperPlanShared(ZookeeperSimpleBindingOperations zookeeperSimpleBindingOperations) {
     this.zookeeperSimpleBindingOperations = zookeeperSimpleBindingOperations;
   }
 
   @Override
-  public void provision(ServiceInstance serviceInstance) throws ServiceInstanceExistsException,
-      ServiceBrokerException {
+  public void provision(ServiceInstance serviceInstance, Optional<Map<String, Object>> parameters)
+      throws ServiceInstanceExistsException, ServiceBrokerException {
     try {
       zookeeperClient.addZNode(serviceInstance.getServiceInstanceId(), new byte[] {});
     } catch (IOException e) {
