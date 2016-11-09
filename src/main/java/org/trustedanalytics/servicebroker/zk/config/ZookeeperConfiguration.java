@@ -55,7 +55,7 @@ public class ZookeeperConfiguration {
   @Bean(initMethod = "init", destroyMethod = "destroy")
   @Profile(Profiles.KERBEROS)
   @Qualifier(Qualifiers.BROKER_INSTANCE)
-  public ZookeeperClient getSecureZKClient() throws IOException, LoginException, KrbException {
+  public ZookeeperClient getSecureZKClient() throws IOException, LoginException, KrbException, NoSuchAlgorithmException {
     LOGGER.info("Found kerberos profile configuration - trying to authenticate.");
     String user = config.getUser();
 
@@ -64,10 +64,8 @@ public class ZookeeperConfiguration {
             kerberosProperties.getKdc(), kerberosProperties.getRealm());
     loginManager.loginWithKeyTab(user, config.getKeytabPath());
 
-    List<ACL> acl = Arrays.asList(new ACL(ZooDefs.Perms.ALL, new Id("sasl", user)));
-
     return new ZookeeperClientBuilder(config.getZkClusterHosts(), config.getUser(),
-        config.getBrokerRootNode(), config.getBrokerRootNode()).withRootCreation(acl).build();
+        config.getPassword(), config.getBrokerRootNode()).withRootCreation(getAcl()).build();
   }
 
   @Bean(initMethod = "init", destroyMethod = "destroy")
@@ -75,15 +73,17 @@ public class ZookeeperConfiguration {
   @Qualifier(Qualifiers.BROKER_INSTANCE)
   public ZookeeperClient getInsecureZKClient() throws IOException, NoSuchAlgorithmException {
     LOGGER.info("Found non-kerberos profile configuration.");
+    return new ZookeeperClientBuilder(config.getZkClusterHosts(), config.getUser(),
+        config.getPassword(), config.getBrokerRootNode()).withRootCreation(getAcl()).build();
+  }
+
+  private List<ACL> getAcl() throws NoSuchAlgorithmException {
     String user = config.getUser();
     String password = config.getPassword();
 
     String digest = DigestAuthenticationProvider.generateDigest(
         String.format("%s:%s", user, password));
-    List<ACL> acl = Arrays.asList(new ACL(ZooDefs.Perms.ALL, new Id("digest", digest)));
-
-    return new ZookeeperClientBuilder(config.getZkClusterHosts(), config.getUser(),
-        config.getPassword(), config.getBrokerRootNode()).withRootCreation(acl).build();
+    return Arrays.asList(new ACL(ZooDefs.Perms.ALL, new Id("digest", digest)));
   }
 
 }
