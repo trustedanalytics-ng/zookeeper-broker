@@ -65,7 +65,7 @@ public class ZookeeperConfiguration {
     loginManager.loginWithKeyTab(user, config.getKeytabPath());
 
     return new ZookeeperClientBuilder(config.getZkClusterHosts(), config.getUser(),
-        config.getPassword(), config.getBrokerRootNode()).withRootCreation(getAcl()).build();
+        config.getPassword(), config.getBrokerRootNode()).build();
   }
 
   @Bean(initMethod = "init", destroyMethod = "destroy")
@@ -74,16 +74,7 @@ public class ZookeeperConfiguration {
   public ZookeeperClient getInsecureZKClient() throws IOException, NoSuchAlgorithmException {
     LOGGER.info("Found non-kerberos profile configuration.");
     return new ZookeeperClientBuilder(config.getZkClusterHosts(), config.getUser(),
-        config.getPassword(), config.getBrokerRootNode()).withRootCreation(getAcl()).build();
-  }
-
-  private List<ACL> getAcl() throws NoSuchAlgorithmException {
-    String user = config.getUser();
-    String password = config.getPassword();
-
-    String digest = DigestAuthenticationProvider.generateDigest(
-        String.format("%s:%s", user, password));
-    return Arrays.asList(new ACL(ZooDefs.Perms.ALL, new Id("digest", digest)));
+        config.getPassword(), config.getBrokerRootNode()).build();
   }
 
 }
