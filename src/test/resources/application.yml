@@ -18,9 +18,9 @@ cf:
     serviceDescription: ZOOKEEPER service for creating znodes on hadoop distributed coordination service
     baseId: fakeBaseGuid
     plans:
-      - id: shared-plan
-        name: shared
-        description: shared
+      - id: standard-plan
+        name: standard
+        description: Creates new znode (within organization access space) and returns connection config data
         free: true
     metadata:
       imageUrl: ${IMAGE_URL:}

@@ -66,7 +66,7 @@ public class ZookeeperBrokerIntegrationTest {
       throws Exception {
     //arrange
     String serviceInstanceId = UUID.randomUUID().toString();
-    ServiceInstance instance = getServiceInstance(serviceInstanceId, "fakeBaseGuid-shared-plan");
+    ServiceInstance instance = getServiceInstance(serviceInstanceId, "fakeBaseGuid-standard-plan");
     CreateServiceInstanceRequest request = getCreateInstanceRequest(instance);
 
     //act
@@ -83,7 +83,7 @@ public class ZookeeperBrokerIntegrationTest {
     //arrange
     String bindingId = UUID.randomUUID().toString();
     String serviceInstanceId = UUID.randomUUID().toString();
-    ServiceInstance instance = getServiceInstance(serviceInstanceId, "fakeBaseGuid-shared-plan");
+    ServiceInstance instance = getServiceInstance(serviceInstanceId, "fakeBaseGuid-standard-plan");
     CreateServiceInstanceRequest instanceReq = getCreateInstanceRequest(instance);
     CreateServiceInstanceBindingRequest bindReq = getCreateBindingRequest(serviceInstanceId).withBindingId(bindingId);
 

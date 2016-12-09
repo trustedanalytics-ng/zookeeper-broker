@@ -26,15 +26,15 @@ import org.junit.Test;
 import org.trustedanalytics.servicebroker.zk.config.ExternalConfiguration;
 import org.trustedanalytics.servicebroker.zk.plans.binding.ZookeeperBindingClientFactory;
 
-public class ZookeeperPlanSharedTest {
+public class ZookeeperPlanStandardTest {
   @Test
   public void bind_addInstanceIdToZnodePath_returnCredentialsMap() throws Exception {
     //arrange
     ExternalConfiguration configuration = new ExternalConfiguration();
     configuration.setBrokerRootNode("/userspace");
 
-    ZookeeperPlanShared plan =
-        new ZookeeperPlanShared(ZookeeperBindingClientFactory.create(configuration));
+    ZookeeperPlanStandard plan =
+        new ZookeeperPlanStandard(ZookeeperBindingClientFactory.create(configuration));
 
     //act
     ServiceInstance serviceInstance = getServiceInstance();

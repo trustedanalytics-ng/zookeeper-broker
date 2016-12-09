@@ -31,8 +31,10 @@ import org.trustedanalytics.servicebroker.framework.service.ServicePlanDefinitio
 import org.trustedanalytics.servicebroker.zk.config.Qualifiers;
 import org.trustedanalytics.servicebroker.zk.plans.binding.ZookeeperSimpleBindingOperations;
 
-@Component("shared")
-class ZookeeperPlanShared implements ServicePlanDefinition {
+@Component("standard")
+class ZookeeperPlanStandard implements ServicePlanDefinition {
+
+  private static final String ZOOKEEPER_NODE = "broker";
 
   @Autowired
   @Qualifier(Qualifiers.BROKER_INSTANCE)
@@ -41,7 +43,7 @@ class ZookeeperPlanShared implements ServicePlanDefinition {
   private ZookeeperSimpleBindingOperations zookeeperSimpleBindingOperations;
 
   @Autowired
-  public ZookeeperPlanShared(ZookeeperSimpleBindingOperations zookeeperSimpleBindingOperations) {
+  public ZookeeperPlanStandard(ZookeeperSimpleBindingOperations zookeeperSimpleBindingOperations) {
     this.zookeeperSimpleBindingOperations = zookeeperSimpleBindingOperations;
   }
 
@@ -49,7 +51,8 @@ class ZookeeperPlanShared implements ServicePlanDefinition {
   public void provision(ServiceInstance serviceInstance, Optional<Map<String, Object>> parameters)
       throws ServiceInstanceExistsException, ServiceBrokerException {
     try {
-      zookeeperClient.addZNode(serviceInstance.getServiceInstanceId(), new byte[] {});
+      zookeeperClient.addZNode(String.format("%s/%s/%s", serviceInstance.getOrganizationGuid(),
+          ZOOKEEPER_NODE, serviceInstance.getServiceInstanceId()), new byte[] {});
     } catch (IOException e) {
       throw new ServiceBrokerException(e);
     }
