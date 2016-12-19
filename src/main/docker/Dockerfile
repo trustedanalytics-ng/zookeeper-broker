@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM tapimages.us.enableiot.com:8080/tap-base-java:java8-jessie
+FROM tapimages:8080/tap-base-java:java8-jessie
 
 ENV VERSION=0.8.0
 
