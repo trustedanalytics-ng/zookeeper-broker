@@ -17,7 +17,6 @@ package org.trustedanalytics.servicebroker.zk.plans.binding;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -36,7 +35,7 @@ class ZookeeperBindingClient implements ZookeeperSimpleBindingOperations {
   }
 
   @Override
-  public Map<String, Object> createCredentialsMap(UUID instanceId) {
+  public Map<String, Object> createCredentialsMap(String instanceId) {
     Map<String, Object> credentialsCopy = new HashMap<>();
     credentialsCopy.put(ZNODE_KEY, String.format("%s/%s", userspacePathTemplate, instanceId));
     return credentialsCopy;

@@ -18,7 +18,6 @@ package org.trustedanalytics.servicebroker.zk.plans;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 
 import org.cloudfoundry.community.servicebroker.exception.ServiceBrokerException;
 import org.cloudfoundry.community.servicebroker.exception.ServiceInstanceExistsException;
@@ -60,7 +59,7 @@ class ZookeeperPlanStandard implements ServicePlanDefinition {
 
   @Override
   public Map<String, Object> bind(ServiceInstance serviceInstance) throws ServiceBrokerException {
-    UUID instanceId = UUID.fromString(serviceInstance.getServiceInstanceId());
+    String instanceId = serviceInstance.getServiceInstanceId();
     return zookeeperSimpleBindingOperations.createCredentialsMap(instanceId);
   }
 }

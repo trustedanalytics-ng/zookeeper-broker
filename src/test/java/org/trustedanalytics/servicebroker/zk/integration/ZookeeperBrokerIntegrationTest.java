@@ -19,8 +19,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.trustedanalytics.servicebroker.test.cloudfoundry.CfModelsFactory.*;
 
-import java.util.UUID;
-
 import org.apache.curator.test.TestingServer;
 import org.cloudfoundry.community.servicebroker.model.CreateServiceInstanceBindingRequest;
 import org.cloudfoundry.community.servicebroker.model.CreateServiceInstanceRequest;
@@ -65,7 +63,7 @@ public class ZookeeperBrokerIntegrationTest {
   public void testCreateServiceInstance_success_shouldStoreInstanceDataInBrokerStore()
       throws Exception {
     //arrange
-    String serviceInstanceId = UUID.randomUUID().toString();
+    String serviceInstanceId = "serviceInstanceId1";
     ServiceInstance instance = getServiceInstance(serviceInstanceId, "fakeBaseGuid-standard-plan");
     CreateServiceInstanceRequest request = getCreateInstanceRequest(instance);
 
@@ -81,8 +79,8 @@ public class ZookeeperBrokerIntegrationTest {
   public void testCreateInstanceBinding_success_shouldReturnZookeeperNodeInCredentials()
       throws Exception {
     //arrange
-    String bindingId = UUID.randomUUID().toString();
-    String serviceInstanceId = UUID.randomUUID().toString();
+    String bindingId = "bindingId";
+    String serviceInstanceId = "serviceInstanceId2";
     ServiceInstance instance = getServiceInstance(serviceInstanceId, "fakeBaseGuid-standard-plan");
     CreateServiceInstanceRequest instanceReq = getCreateInstanceRequest(instance);
     CreateServiceInstanceBindingRequest bindReq = getCreateBindingRequest(serviceInstanceId).withBindingId(bindingId);
