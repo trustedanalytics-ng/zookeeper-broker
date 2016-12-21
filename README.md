@@ -3,7 +3,8 @@
 
 zookeeper-broker
 ================
-Cloud foundry broker for Zookeeper.
+
+Broker for creation znodes on Zookeeper.
 
 # How to use it?
 To use zookeeper-broker, you need to build it from sources configure, deploy, create instance and bind it to your app. Follow steps described below. 
@@ -13,93 +14,65 @@ Run command for compile and package.:
 ```
 mvn clean package
 ```
-
-## Kerberos configuration
-Broker automatically bind to an existing kerberos provide service. This will provide default kerberos configuration, for REALM and KDC host. Before deploy check:
-
-- if kerberos service does not exists in your space, you can create it with command:
+Run optional command for create docker image:
 ```
-cf cups kerberos-service -p '{ "kdc": "kdc-host", "kpassword": "kerberos-password", "krealm": "kerberos-realm", "kuser": "kerberos-user" }'
+mvn docker:build
 ```
 
-- if kerberos-service exists in your space, you can update it with command:
-```
-cf uups kerberos-service -p '{ "kdc": "kdc-host", "kpassword": "kerberos-password", "krealm": "kerberos-realm", "kuser": "kerberos-user" }'
-```
+## Plans
 
-## Deploy 
-Push broker binary code to cloud foundry (use cf client).:
-```
-cf push zookeeper-broker -p target/zookeeper-broker-*.jar -m 512M -i 1 --no-start
-```
+  * Standard : Create private znode within space shared across your organization
 
 ## Configure
-For strict separation of config from code (twelve-factor principle), configuration must be placed in environment variables.
- 
-Broker configuration params list (environment properties):
-* obligatory
-  * USER_PASSWORD - password to interact with service broker
-  * ZK_CLUSTER_URL - comma separated ip addresses of zookeeper nodes (in case of Kerberos, domain names should be used) for instance : host-1.domain:2181,host-2.domain:2181
-* optional :
-  * BASE_GUID - base id for catalog plan creation (uuid)
-  * CF_CATALOG_SERVICENAME - service name in cloud foundry catalog (default: zookeeper)
-  * CF_CATALOG_SERVICEID - service id in cloud foundry catalog (default: zookeeper)
-  * ZK_BRK_STORE - (default: /zkbrk_store)
-  * ZK_BRK_ROOT - (default: /platform)
 
-For instance.:
-```
-cf se zookeeper-broker ZK_CLUSTER_URL host-1.domain:2181,host-2.domain:2181
-```
+###Profiles 
+Each profile describes authentication used during communication with Hadoop, at least one is required: 
 
-## Start  service broker application
-
-Use cf client :
-```
-cf start  zookeeper-broker
-```
-## Create new service instance 
+  * simple
+  * kerberos
   
-Use cf client : 
-```
-cf create-service-broker zookeeper-broker <user> <password> https://zookeeper-broker.<platform_domain>
-cf enable-service-access zookeeper
-cf cs zookeeper shared  zookeeper-instance
-```
+### Broker library
+Broker library is java spring library, which simplifies broker store implementation. Currently zookeeper-broker uses zookeeper-broker store implementation, which stores information about every instance in secured znode.
 
-## Binding broker instance
+* obligatory
+  * simple
+    * STORE_CLUSTER : zookeeper quorum address (example: host1:2181,host2:2181,host:2181)
+    * STORE_USER : user used to authenticate with zookeeper broker store
+    * STORE_PASSWORD : password for store user
+  * kerberos
+    * STORE_KEYTABPATH : path to the keytab file, which will be used to authenticate STORE_USER in kerberos
 
-Broker instance can be bind with cf client :
-```
-cf bs <app> zookeeper-instance
-```
-or by configuration in app's manifest.yml : 
-```yaml
-  services:
-    - zookeeper-instance
-```
+### Other
+* obligatory
+  * simple
+    * USER_PASSWORD - password to interact with service broker Rest API
+    * BASE_GUID - base id for catalog plan creation
+    * CATALOG_SERVICENAME - service name in catalog (default: zookeeper)
+    * CATALOG_SERVICEID - service id in catalog (default: zookeeper)
+    * SYSTEM_USER : name of the regular user which will be used to create znodes
+    * ZK_CLUSTER_URL - comma separated ip addresses of zookeeper nodes (in case of Kerberos, domain names should be used) for instance : host-1.domain:2181,host-2.domain:2181
+    * ZK_BRK_ROOT - root directory where znode will be created
+  * kerberos
+    * KRB_REALM : Kerberos Realm (kerberos profile required)
+    * KRB_KDC : Key Distribution Center Adddress (kerberos profile required)
+    * SYSTEM_USER_KEYTAB_PATH : path to the keytab file, which will be used to authenticate SYSTEM_USER in kerberos
 
-To check if broker instance is bound, use cf client : 
-```
-cf env <app>
-```
-and look for : 
-```yaml
-  "zookeeper": [
-   {
-    "credentials": {
-     "kerberos": {
-      "kdc": "ip-10-10-9-198.us-west-2.compute.internal",
-      "krealm": "US-WEST-2.COMPUTE.INTERNAL"
-     },
-     "zk.cluster": "host-1.domain:2181,host-2.domain:2181",
-     "zk.node": "/platform/e59a67b8-bcad-403e-a2a9-6bde5285f05e"
-    },
-    "label": "zookeeper",
-    "name": "zookeeper-instance",
-    "plan": "shared",
-    "tags": []
-   }
-  ]
-```
-in VCAP_SERVICES.
+
+## Useful links
+
+Offering template for TAP platform:
+ * https://github.com/intel-data/tap-deploy/blob/master/roles/tap-marketplace-offerings/templates/zookeeper/offering.json
+
+Broker library:
+ * https://github.com/intel-data/broker-lib    
+
+Cloud foundry resources that are helpful when troubleshooting service brokers : 
+ * http://docs.cloudfoundry.org/services/api.html
+ * http://docs.cloudfoundry.org/devguide/services/managing-services.html#update_service
+ * http://docs.cloudfoundry.org/services/access-control.html
+
+## On the app side
+
+For spring applications use https://github.com/trustedanalytics/hadoop-spring-utils. 
+
+For regular java applications use https://github.com/trustedanalytics/hadoop-utils. 
