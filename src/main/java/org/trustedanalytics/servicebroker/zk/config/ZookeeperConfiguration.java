@@ -17,15 +17,9 @@ package org.trustedanalytics.servicebroker.zk.config;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
-import java.util.List;
 
 import javax.security.auth.login.LoginException;
 
-import org.apache.zookeeper.ZooDefs;
-import org.apache.zookeeper.data.ACL;
-import org.apache.zookeeper.data.Id;
-import org.apache.zookeeper.server.auth.DigestAuthenticationProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,7 +52,8 @@ public class ZookeeperConfiguration {
   public ZookeeperClient getSecureZKClient() throws IOException, LoginException, KrbException, NoSuchAlgorithmException {
     LOGGER.info("Found kerberos profile configuration - trying to authenticate.");
     String user = config.getUser();
-
+    System.setProperty("zookeeper.sasl.clientconfig", user);
+    
     KrbLoginManager loginManager =
         KrbLoginManagerFactory.getInstance().getKrbLoginManagerInstance(
             kerberosProperties.getKdc(), kerberosProperties.getRealm());
