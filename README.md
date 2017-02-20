@@ -58,7 +58,7 @@ Broker library is java spring library, which simplifies broker store implementat
 ## Useful links
 
 Offering template for TAP platform:
- * https://github.com/intel-data/tap-deploy/blob/master/roles/tap-marketplace-offerings/templates/zookeeper/offering.json
+ * https://github.com/trustedanalytics-ng/tap-deploy/blob/master/roles/tap-marketplace-offerings/templates/zookeeper/offering.json
 
 Broker library:
  * https://github.com/intel-data/broker-lib    
@@ -70,6 +70,6 @@ Cloud foundry resources that are helpful when troubleshooting service brokers :
 
 ## On the app side
 
-For spring applications use https://github.com/trustedanalytics/hadoop-spring-utils. 
+For spring applications use https://github.com/trustedanalytics-ng/hadoop-spring-utils. 
 
-For regular java applications use https://github.com/trustedanalytics/hadoop-utils. 
+For regular java applications use https://github.com/trustedanalytics-ng/hadoop-utils. 
